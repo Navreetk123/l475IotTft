@@ -57,36 +57,6 @@
 /* Private defines */
 
 
-#define ILI9341_RESET				0x01
-#define ILI9341_SLEEP_OUT			0x11
-#define ILI9341_GAMMA				0x26
-#define ILI9341_DISPLAY_OFF			0x28
-#define ILI9341_DISPLAY_ON			0x29
-#define ILI9341_COLUMN_ADDR			0x2A
-#define ILI9341_PAGE_ADDR			0x2B
-#define ILI9341_GRAM				0x2C
-#define ILI9341_MAC					0x36
-#define ILI9341_PIXEL_FORMAT		0x3A
-#define ILI9341_WDB					0x51
-#define ILI9341_WCD					0x53
-#define ILI9341_RGB_INTERFACE		0xB0
-#define ILI9341_FRC					0xB1
-#define ILI9341_BPC					0xB5
-#define ILI9341_DFC					0xB6
-#define ILI9341_POWER1				0xC0
-#define ILI9341_POWER2				0xC1
-#define ILI9341_VCOM1				0xC5
-#define ILI9341_VCOM2				0xC7
-#define ILI9341_POWERA				0xCB
-#define ILI9341_POWERB				0xCF
-#define ILI9341_PGAMMA				0xE0
-#define ILI9341_NGAMMA				0xE1
-#define ILI9341_DTCA				0xE8
-#define ILI9341_DTCB				0xEA
-#define ILI9341_POWER_SEQ			0xED
-#define ILI9341_3GAMMA_EN			0xF2
-#define ILI9341_INTERFACE			0xF6
-#define ILI9341_PRC					0xF7
 
 /* USER CODE END PD */
 
@@ -127,9 +97,8 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
-void     LCD_IO_Init(void);
-void InitLCD_ILI9341(void);
-//void LcdWriteData(uint8_t Reg);
+
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -175,27 +144,23 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 
-  LCD_IO_Init();
 
-
-  //int success = GUI_Init();
   InitLCD_ILI9341();
 
   GUI_Init();
 
-  	GUI_SetFont(&GUI_Font8x16);
-  	GUI_SetBkColor(GUI_BLUE);
-  	GUI_Clear();
+  GUI_SetFont(&GUI_Font8x16);
+  GUI_SetBkColor(GUI_BLUE);
+  GUI_Clear();
 
-  	GUI_SetColor(GUI_CYAN);			//foreground or text color
-  	GUI_DispString("ECET260 Test Program\tStemwin ver: ");
+  GUI_SetColor(GUI_CYAN);			//foreground or text color
+  GUI_DispString("ECET260 Test Program\tStemwin ver: ");
 
-  	GUI_DispString(GUI_GetVersionString());
-  	GUI_DispString("\n\n\n");
+  GUI_DispString(GUI_GetVersionString());
+  GUI_DispString("\n\n\n");
 
-  	GUI_SetFont(&GUI_Font32B_ASCII);
-  	GUI_SetColor(GUI_WHITE);		//foreground or text color
-
+  GUI_SetFont(&GUI_Font32B_ASCII);
+  GUI_SetColor(GUI_WHITE);		//foreground or text color
 
 
     int i=0;
@@ -746,182 +711,8 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void     LCD_IO_Init(void)
-{
-	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_SET); 		//disable RD
-	HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
-	//HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET); 		//disable CS
-	HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET); 		//enable CS
-
-}
-
-//void     LcdWriteReg(uint8_t Reg)
-//{
-//	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET);
-//
-//	HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);  //enable
-//	HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_RESET);
-//	HAL_Delay(5);
-//	HAL_GPIO_WritePin(LCD_D7_GPIO_Port, LCD_D7_Pin,(Reg&0b10000000)>>7);
-//	HAL_GPIO_WritePin(LCD_D6_GPIO_Port, LCD_D6_Pin,(Reg&0b01000000)>>6);
-//	HAL_GPIO_WritePin(LCD_D5_GPIO_Port, LCD_D5_Pin,(Reg&0b00100000)>>5);
-//	HAL_GPIO_WritePin(LCD_D4_GPIO_Port, LCD_D4_Pin,(Reg&0b00010000)>>4);
-//	HAL_GPIO_WritePin(LCD_D3_GPIO_Port, LCD_D3_Pin,(Reg&0b00001000)>>3);
-//	HAL_GPIO_WritePin(LCD_D2_GPIO_Port, LCD_D2_Pin,(Reg&0b00000100)>>2);
-//	HAL_GPIO_WritePin(LCD_D1_GPIO_Port, LCD_D1_Pin,(Reg&0b00000010)>>1);
-//	HAL_GPIO_WritePin(LCD_D0_GPIO_Port, LCD_D0_Pin,(Reg&0b00000001)>>0);
-//	HAL_Delay(5);
-//	HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_SET);
-//	HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
-//
-//}
-//
-//void     LcdWriteData(uint8_t Reg)
-//{
-//	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
-//
-//	HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);  //enable
-//	HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_RESET);
-//	HAL_Delay(5);
-//	HAL_GPIO_WritePin(LCD_D7_GPIO_Port, LCD_D7_Pin,(Reg&0b10000000)>>7);
-//	HAL_GPIO_WritePin(LCD_D6_GPIO_Port, LCD_D6_Pin,(Reg&0b01000000)>>6);
-//	HAL_GPIO_WritePin(LCD_D5_GPIO_Port, LCD_D5_Pin,(Reg&0b00100000)>>5);
-//	HAL_GPIO_WritePin(LCD_D4_GPIO_Port, LCD_D4_Pin,(Reg&0b00010000)>>4);
-//	HAL_GPIO_WritePin(LCD_D3_GPIO_Port, LCD_D3_Pin,(Reg&0b00001000)>>3);
-//	HAL_GPIO_WritePin(LCD_D2_GPIO_Port, LCD_D2_Pin,(Reg&0b00000100)>>2);
-//	HAL_GPIO_WritePin(LCD_D1_GPIO_Port, LCD_D1_Pin,(Reg&0b00000010)>>1);
-//	HAL_GPIO_WritePin(LCD_D0_GPIO_Port, LCD_D0_Pin,(Reg&0b00000001)>>0);
-//	HAL_Delay(5);
-//	HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_SET);
-//	HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
-//
-//}
-//void     LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size)
-//{
-//	uint32_t count=0;
-//
-//	while(count < Size)
-//	{
-//		LcdWriteReg(*pData);
-//		count++;
-//	}
-//
-//}
-void InitLCD_ILI9341(void) {
-	/* Force reset */
-	  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
-	  HAL_Delay(30);
-	  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET);
-	  HAL_Delay(10);
-	  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
 
 
-	/* Delay for RST response */
-	HAL_Delay(200);
-
-	/* Software reset */
-	LcdWriteReg(ILI9341_RESET);
-	HAL_Delay(100);
-
-	LcdWriteReg(ILI9341_POWERA);
-	LcdWriteData(0x39);
-	LcdWriteData(0x2C);
-	LcdWriteData(0x00);
-	LcdWriteData(0x34);
-	LcdWriteData(0x02);
-	LcdWriteReg(ILI9341_POWERB);
-	LcdWriteData(0x00);
-	LcdWriteData(0xC1);
-	LcdWriteData(0x30);
-	LcdWriteReg(ILI9341_DTCA);
-	LcdWriteData(0x85);
-	LcdWriteData(0x00);
-	LcdWriteData(0x78);
-	LcdWriteReg(ILI9341_DTCB);
-	LcdWriteData(0x00);
-	LcdWriteData(0x00);
-	LcdWriteReg(ILI9341_POWER_SEQ);
-	LcdWriteData(0x64);
-	LcdWriteData(0x03);
-	LcdWriteData(0x12);
-	LcdWriteData(0x81);
-	LcdWriteReg(ILI9341_PRC);
-	LcdWriteData(0x20);
-	LcdWriteReg(ILI9341_POWER1); //4.6V
-	LcdWriteData(0x23);
-	LcdWriteReg(ILI9341_POWER2);
-	LcdWriteData(0x10);
-	LcdWriteReg(ILI9341_VCOM1);
-	LcdWriteData(0x3E);		//vcomh 4.250V
-	LcdWriteData(0x28);		//vcoml -1.500V
-	LcdWriteReg(ILI9341_VCOM2);
-	LcdWriteData(0x86);
-	LcdWriteReg(ILI9341_MAC); //memory access control
-	LcdWriteData(0x48);	//48
-	LcdWriteReg(ILI9341_PIXEL_FORMAT);
-	LcdWriteData(0x55);	//rgb  16bits/pixel mcu 16bits/pixel
-	LcdWriteReg(ILI9341_FRC); //Frame Rate Cntrol
-	LcdWriteData(0x00); //diva freq == fosc
-	LcdWriteData(0x18);	//79Hz refresh
-	LcdWriteReg(ILI9341_DFC);//display function control
-	LcdWriteData(0x08);
-	LcdWriteData(0xA2); //normally white, gs - g1-g320, ss - s720-s1
-	LcdWriteData(0x27);
-	LcdWriteReg(ILI9341_3GAMMA_EN);
-	LcdWriteData(0x00);
-	LcdWriteReg(ILI9341_COLUMN_ADDR);
-	LcdWriteData(0x00);
-	LcdWriteData(0x00);
-	LcdWriteData(0x00);
-	LcdWriteData(0xEF);
-	LcdWriteReg(ILI9341_PAGE_ADDR);
-	LcdWriteData(0x00);
-	LcdWriteData(0x00);
-	LcdWriteData(0x01);
-	LcdWriteData(0x3F);
-	LcdWriteReg(ILI9341_GAMMA);
-	LcdWriteData(0x01);
-	LcdWriteReg(ILI9341_PGAMMA);
-	LcdWriteData(0x0F);
-	LcdWriteData(0x31);
-	LcdWriteData(0x2B);
-	LcdWriteData(0x0C);
-	LcdWriteData(0x0E);
-	LcdWriteData(0x08);
-	LcdWriteData(0x4E);
-	LcdWriteData(0xF1);
-	LcdWriteData(0x37);
-	LcdWriteData(0x07);
-	LcdWriteData(0x10);
-	LcdWriteData(0x03);
-	LcdWriteData(0x0E);
-	LcdWriteData(0x09);
-	LcdWriteData(0x00);
-	LcdWriteReg(ILI9341_NGAMMA);
-	LcdWriteData(0x00);
-	LcdWriteData(0x0E);
-	LcdWriteData(0x14);
-	LcdWriteData(0x03);
-	LcdWriteData(0x11);
-	LcdWriteData(0x07);
-	LcdWriteData(0x31);
-	LcdWriteData(0xC1);
-	LcdWriteData(0x48);
-	LcdWriteData(0x08);
-	LcdWriteData(0x0F);
-	LcdWriteData(0x0C);
-	LcdWriteData(0x31);
-	LcdWriteData(0x36);
-	LcdWriteData(0x0F);
-	LcdWriteReg(ILI9341_SLEEP_OUT);
-
-	HAL_Delay(100);
-
-	LcdWriteReg(ILI9341_DISPLAY_ON);
-	LcdWriteReg(ILI9341_GRAM);
-}
 /* USER CODE END 4 */
 
 /**

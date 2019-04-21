@@ -49,6 +49,7 @@ Purpose     : Display controller configuration (single layer)
 #include "GUI.h"
 #include "GUIDRV_FlexColor.h"
 #include "main.h"
+#include "LCDConf.h"
 
 /*********************************************************************
 *
@@ -153,7 +154,7 @@ void LcdWriteData(U8 Data) {
 * Function description:
 *   Writes multiple values to a display register.
 */
-static void LcdWriteDataMultiple(U8 * pData, int NumItems) {
+void LcdWriteDataMultiple(U8 * pData, int NumItems) {
   while (NumItems--) {
     // ... TBD by user
 		HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);	//data mode
@@ -183,7 +184,7 @@ static void LcdWriteDataMultiple(U8 * pData, int NumItems) {
 * Function description:
 *   Reads multiple values from a display register.
 */
-static void LcdReadDataMultiple(U8 * pData, int NumItems) {
+void LcdReadDataMultiple(U8 * pData, int NumItems) {
   while (NumItems--) {
     // ... TBD by user
   }
@@ -274,6 +275,131 @@ int LCD_X_DisplayDriver(unsigned LayerIndex, unsigned Cmd, void * pData) {
     r = -1;
   }
   return r;
+}
+
+//ILI9341 specific functions
+
+void InitLCD_ILI9341(void) {
+
+	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_SET); 			//disable RD
+	HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET); 		//disable CS
+	HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET); 		//enable CS
+
+
+	/* Force reset */
+	  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
+	  HAL_Delay(30);
+	  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET);
+	  HAL_Delay(10);
+	  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
+
+
+	/* Delay for RST response */
+	HAL_Delay(200);
+
+	/* Software reset */
+	LcdWriteReg(ILI9341_RESET);
+	HAL_Delay(100);
+
+	LcdWriteReg(ILI9341_POWERA);
+	LcdWriteData(0x39);
+	LcdWriteData(0x2C);
+	LcdWriteData(0x00);
+	LcdWriteData(0x34);
+	LcdWriteData(0x02);
+	LcdWriteReg(ILI9341_POWERB);
+	LcdWriteData(0x00);
+	LcdWriteData(0xC1);
+	LcdWriteData(0x30);
+	LcdWriteReg(ILI9341_DTCA);
+	LcdWriteData(0x85);
+	LcdWriteData(0x00);
+	LcdWriteData(0x78);
+	LcdWriteReg(ILI9341_DTCB);
+	LcdWriteData(0x00);
+	LcdWriteData(0x00);
+	LcdWriteReg(ILI9341_POWER_SEQ);
+	LcdWriteData(0x64);
+	LcdWriteData(0x03);
+	LcdWriteData(0x12);
+	LcdWriteData(0x81);
+	LcdWriteReg(ILI9341_PRC);
+	LcdWriteData(0x20);
+	LcdWriteReg(ILI9341_POWER1); //4.6V
+	LcdWriteData(0x23);
+	LcdWriteReg(ILI9341_POWER2);
+	LcdWriteData(0x10);
+	LcdWriteReg(ILI9341_VCOM1);
+	LcdWriteData(0x3E);		//vcomh 4.250V
+	LcdWriteData(0x28);		//vcoml -1.500V
+	LcdWriteReg(ILI9341_VCOM2);
+	LcdWriteData(0x86);
+	LcdWriteReg(ILI9341_MAC); //memory access control
+	LcdWriteData(0x48);	//48
+	LcdWriteReg(ILI9341_PIXEL_FORMAT);
+	LcdWriteData(0x55);	//rgb  16bits/pixel mcu 16bits/pixel
+	LcdWriteReg(ILI9341_FRC); //Frame Rate Cntrol
+	LcdWriteData(0x00); //diva freq == fosc
+	LcdWriteData(0x18);	//79Hz refresh
+	LcdWriteReg(ILI9341_DFC);//display function control
+	LcdWriteData(0x08);
+	LcdWriteData(0xA2); //normally white, gs - g1-g320, ss - s720-s1
+	LcdWriteData(0x27);
+	LcdWriteReg(ILI9341_3GAMMA_EN);
+	LcdWriteData(0x00);
+	LcdWriteReg(ILI9341_COLUMN_ADDR);
+	LcdWriteData(0x00);
+	LcdWriteData(0x00);
+	LcdWriteData(0x00);
+	LcdWriteData(0xEF);
+	LcdWriteReg(ILI9341_PAGE_ADDR);
+	LcdWriteData(0x00);
+	LcdWriteData(0x00);
+	LcdWriteData(0x01);
+	LcdWriteData(0x3F);
+	LcdWriteReg(ILI9341_GAMMA);
+	LcdWriteData(0x01);
+	LcdWriteReg(ILI9341_PGAMMA);
+	LcdWriteData(0x0F);
+	LcdWriteData(0x31);
+	LcdWriteData(0x2B);
+	LcdWriteData(0x0C);
+	LcdWriteData(0x0E);
+	LcdWriteData(0x08);
+	LcdWriteData(0x4E);
+	LcdWriteData(0xF1);
+	LcdWriteData(0x37);
+	LcdWriteData(0x07);
+	LcdWriteData(0x10);
+	LcdWriteData(0x03);
+	LcdWriteData(0x0E);
+	LcdWriteData(0x09);
+	LcdWriteData(0x00);
+	LcdWriteReg(ILI9341_NGAMMA);
+	LcdWriteData(0x00);
+	LcdWriteData(0x0E);
+	LcdWriteData(0x14);
+	LcdWriteData(0x03);
+	LcdWriteData(0x11);
+	LcdWriteData(0x07);
+	LcdWriteData(0x31);
+	LcdWriteData(0xC1);
+	LcdWriteData(0x48);
+	LcdWriteData(0x08);
+	LcdWriteData(0x0F);
+	LcdWriteData(0x0C);
+	LcdWriteData(0x31);
+	LcdWriteData(0x36);
+	LcdWriteData(0x0F);
+	LcdWriteReg(ILI9341_SLEEP_OUT);
+
+	HAL_Delay(100);
+
+	LcdWriteReg(ILI9341_DISPLAY_ON);
+	LcdWriteReg(ILI9341_GRAM);
 }
 
 /*************************** End of file ****************************/
