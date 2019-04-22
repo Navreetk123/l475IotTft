@@ -149,7 +149,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_CRC_Init();
-  MX_ADC1_Init();
+//  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
 
@@ -218,12 +218,12 @@ int main(void)
 	  PROGBAR_SetValue(hProgbar, count/1000);		//use dec value for bar position
 	  PROGBAR_SetText(hProgbar, countString); 		//use string for text on progress bar
 
-//	  GUI_DispDecAt(pfGetPENIRQ(), 200,50,3);
+	  GUI_DispDecAt(pfGetPENIRQ(), 200,50,3);
 
-//	  if(pfGetPENIRQ())
-//	  {
-//		  GUI_DispDecAt(GUI_TOUCH_X_MeasureX(), 200,20,5);
-//	  }
+	  if(pfGetPENIRQ())
+	  {
+		  GUI_DispDecAt(GUI_TOUCH_X_MeasureX(), 200,20,5);
+	  }
 
 
 	  GUI_Exec();
@@ -361,7 +361,7 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Regular Channel 
   */
-  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Channel = ADC_CHANNEL_3;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;

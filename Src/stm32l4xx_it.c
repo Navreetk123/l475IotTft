@@ -214,7 +214,7 @@ void SysTick_Handler(void)
 	{
 		Prescaler=100;
 
-		Convert_Pos();
+//		Convert_Pos();
 	}
   /* USER CODE END SysTick_IRQn 1 */
 }
