@@ -218,12 +218,12 @@ int main(void)
 	  PROGBAR_SetValue(hProgbar, count/1000);		//use dec value for bar position
 	  PROGBAR_SetText(hProgbar, countString); 		//use string for text on progress bar
 
-	  GUI_DispDecAt(pfGetPENIRQ(), 200,50,3);
+//	  GUI_DispDecAt(pfGetPENIRQ(), 200,50,3);
 
-	  if(pfGetPENIRQ())
-	  {
-		  GUI_DispDecAt(GUI_TOUCH_X_MeasureX(), 200,20,5);
-	  }
+//	  if(pfGetPENIRQ())
+//	  {
+//		  GUI_DispDecAt(GUI_TOUCH_X_MeasureX(), 200,20,5);
+//	  }
 
 
 	  GUI_Exec();

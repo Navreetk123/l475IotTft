@@ -67,7 +67,7 @@ char pfGetPENIRQ()
 	//test for touch
 	HAL_GPIO_WritePin(X1_PORT,X1_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(X2_PORT,X2_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(Y1_PORT,Y1_Pin, GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(Y1_PORT,Y1_Pin, GPIO_PIN_SET);
 
 	//Configure GPIO pins :Y2_Pin digital input
 	GPIO_InitStruct.Pin = Y2_Pin;
@@ -76,12 +76,17 @@ char pfGetPENIRQ()
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(Y2_PORT, &GPIO_InitStruct);
 
+	//Configure GPIO pins :Y2_Pin digital input
+	GPIO_InitStruct.Pin = Y1_Pin;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(Y1_PORT, &GPIO_InitStruct);
 
-	touch = HAL_GPIO_ReadPin(Y2_PORT, Y2_Pin);
+
+	touch = HAL_GPIO_ReadPin(Y1_PORT, Y1_Pin);
 
 
 	//Configure GPIO pins :Y2_Pin digital output
-	GPIO_InitStruct.Pin = Y2_Pin;
+	GPIO_InitStruct.Pin = Y2_Pin | Y1_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -89,7 +94,7 @@ char pfGetPENIRQ()
 
 	HAL_GPIO_WritePin(X1_PORT,X1_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(X2_PORT,X2_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(Y1_PORT,Y1_Pin, GPIO_PIN_RESET);
+//	HAL_GPIO_WritePin(Y1_PORT,Y1_Pin, GPIO_PIN_RESET);
 
 	if(!touch) //active low
 		return 1;
@@ -114,6 +119,8 @@ uint32_t TPReadX(void)
 {
 
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	ADC_ChannelConfTypeDef sConfig = {0};
+
 	uint32_t x=0;
 
 	//setup for touch
@@ -135,6 +142,18 @@ uint32_t TPReadX(void)
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	  HAL_GPIO_Init(Y1_PORT, &GPIO_InitStruct);
 
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_3;
+	  sConfig.Rank = ADC_REGULAR_RANK_1;
+	  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+	  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+	  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+	  sConfig.Offset = 0;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
 
 	  HAL_ADC_Start(&hadc1);
 	  HAL_ADC_PollForConversion(&hadc1, 100);
@@ -150,7 +169,7 @@ uint32_t TPReadX(void)
 
 	HAL_GPIO_WritePin(X1_PORT,X1_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(X2_PORT,X2_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(Y2_PORT,Y2_Pin, GPIO_PIN_RESET);
+//	HAL_GPIO_WritePin(Y2_PORT,Y2_Pin, GPIO_PIN_RESET);
 
 
 	return x;
