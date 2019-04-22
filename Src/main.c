@@ -45,6 +45,9 @@
 /* USER CODE BEGIN Includes */
 #include "GUI.h"
 #include "LCDConf.h"
+#include "DIALOG.h"
+#include <stdio.h>
+#include "ts.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,6 +69,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 CRC_HandleTypeDef hcrc;
 
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
@@ -96,6 +101,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
+static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 
 
@@ -113,7 +119,8 @@ static void MX_CRC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	PROGBAR_Handle hProgbar;
+	BUTTON_Handle hButton;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -142,6 +149,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_CRC_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
 
@@ -162,8 +170,36 @@ int main(void)
   GUI_SetFont(&GUI_Font32B_ASCII);
   GUI_SetColor(GUI_WHITE);		//foreground or text color
 
+  GUI_DrawGradientH(5, 150, 315, 235, 0x0000FF, 0x00FFFF);
 
-    int i=0;
+  PROGBAR_SetDefaultSkin(PROGBAR_SKIN_FLEX); // Sets the default skin for new widgets
+
+  /* Create progress bar at location x = 10, y = 10, length = 219, height = 30 */
+  hProgbar = PROGBAR_CreateEx(50, 180, 219, 30, 0, WM_CF_SHOW, 0, GUI_ID_PROGBAR0);
+
+  /* Set progress bar font */
+  PROGBAR_SetFont(hProgbar, &GUI_Font8x16);
+
+  PROGBAR_SetMinMax(hProgbar, 0, 99);
+
+  /* Set progress bar text */
+  PROGBAR_SetText(hProgbar, "...");
+
+
+  // Create the button
+  hButton = BUTTON_CreateEx(120, 100, 80, 60, 0, WM_CF_SHOW, 0, GUI_ID_BUTTON0);
+
+
+
+
+  BUTTON_SetFont(hButton, &GUI_Font8x16);
+  // Set the button text
+  BUTTON_SetText(hButton, "Test");
+  GUI_Exec();
+
+  int count=0;
+  char countString[10];
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -174,10 +210,29 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  GUI_DispDecAt( i++, 20,20,5);
-	  if (i > 99999) {
-	  i = 0;
+
+	  GUI_DispDecAt(count, 20,20,5);
+
+	  sprintf(countString, "%d", count);
+
+	  PROGBAR_SetValue(hProgbar, count/1000);		//use dec value for bar position
+	  PROGBAR_SetText(hProgbar, countString); 		//use string for text on progress bar
+
+//	  GUI_DispDecAt(pfGetPENIRQ(), 200,50,3);
+
+//	  if(pfGetPENIRQ())
+//	  {
+//		  GUI_DispDecAt(GUI_TOUCH_X_MeasureX(), 200,20,5);
+//	  }
+
+
+	  GUI_Exec();
+
+	  if (count++ > 99999) {
+	  count = 0;
 	  }
+
+
   }
   /* USER CODE END 3 */
 }
@@ -229,10 +284,11 @@ void SystemClock_Config(void)
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART3
                               |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_DFSDM1
-                              |RCC_PERIPHCLK_USB;
+                              |RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
   PeriphClkInit.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
+  PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_PLLSAI1;
   PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
   PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLLSAI1;
   PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_MSI;
@@ -241,7 +297,7 @@ void SystemClock_Config(void)
   PeriphClkInit.PLLSAI1.PLLSAI1P = RCC_PLLP_DIV7;
   PeriphClkInit.PLLSAI1.PLLSAI1Q = RCC_PLLQ_DIV2;
   PeriphClkInit.PLLSAI1.PLLSAI1R = RCC_PLLR_DIV2;
-  PeriphClkInit.PLLSAI1.PLLSAI1ClockOut = RCC_PLLSAI1_48M2CLK;
+  PeriphClkInit.PLLSAI1.PLLSAI1ClockOut = RCC_PLLSAI1_48M2CLK|RCC_PLLSAI1_ADC1CLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -255,6 +311,70 @@ void SystemClock_Config(void)
   /** Enable MSI Auto calibration 
   */
   HAL_RCCEx_EnableMSIPLLMode();
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_MultiModeTypeDef multimode = {0};
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+  /** Common config 
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.LowPowerAutoWait = DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc1.Init.OversamplingMode = DISABLE;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure the ADC multi-mode 
+  */
+  multimode.Mode = ADC_MODE_INDEPENDENT;
+  if (HAL_ADCEx_MultiModeConfigChannel(&hadc1, &multimode) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel 
+  */
+  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  sConfig.Offset = 0;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -570,8 +690,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOE, M24SR64_Y_RF_DISABLE_Pin|M24SR64_Y_GPO_Pin|ISM43362_RST_Pin|ISM43362_SPI3_CSN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LCD_RST_Pin|LCD_CS_Pin|LCD_RS_Pin|LCD_WR_Pin 
-                          |LCD_RD_Pin|VL53L0X_XSHUT_Pin|LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LCD_RST_Pin|LCD_WR_Pin|LCD_RD_Pin|VL53L0X_XSHUT_Pin 
+                          |LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, SD_SS_Pin|LCD_D4_Pin|LCD_D7_Pin|SPBTLE_RF_RST_Pin 
@@ -605,19 +725,19 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(BUTTON_EXTI13_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ARD_A5_Pin */
-  GPIO_InitStruct.Pin = ARD_A5_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ARD_A5_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_RST_Pin LCD_CS_Pin LCD_RS_Pin LCD_WR_Pin 
-                           LCD_RD_Pin VL53L0X_XSHUT_Pin LED3_WIFI__LED4_BLE_Pin */
-  GPIO_InitStruct.Pin = LCD_RST_Pin|LCD_CS_Pin|LCD_RS_Pin|LCD_WR_Pin 
-                          |LCD_RD_Pin|VL53L0X_XSHUT_Pin|LED3_WIFI__LED4_BLE_Pin;
+  /*Configure GPIO pins : LCD_RST_Pin LCD_WR_Pin LCD_RD_Pin VL53L0X_XSHUT_Pin 
+                           LED3_WIFI__LED4_BLE_Pin */
+  GPIO_InitStruct.Pin = LCD_RST_Pin|LCD_WR_Pin|LCD_RD_Pin|VL53L0X_XSHUT_Pin 
+                          |LED3_WIFI__LED4_BLE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LCD_CS_Pin LCD_RS_Pin */
+  GPIO_InitStruct.Pin = LCD_CS_Pin|LCD_RS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : ARD_D1_Pin ARD_D0_Pin */

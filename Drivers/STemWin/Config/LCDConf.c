@@ -281,6 +281,16 @@ int LCD_X_DisplayDriver(unsigned LayerIndex, unsigned Cmd, void * pData) {
 
 void InitLCD_ILI9341(void) {
 
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	//Make sure analog pins used for touch input set to digital
+	  //Configure GPIO pins : LCD_RS_Pin and LCD_CS digital output
+	  GPIO_InitStruct.Pin = LCD_RS_Pin | LCD_CS_Pin;
+	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	  GPIO_InitStruct.Pull = GPIO_NOPULL;
+	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
 	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_SET); 			//disable RD
 	HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_SET);

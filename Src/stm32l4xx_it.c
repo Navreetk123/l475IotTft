@@ -38,6 +38,8 @@
 #include "stm32l4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "GUI.h"
+#include "ts.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,7 +59,9 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+extern volatile GUI_TIMER_TIME OS_TimeMS;
 
+char Prescaler = 100;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,6 +71,7 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 
 /* USER CODE END 0 */
 
@@ -201,7 +206,16 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
+	OS_TimeMS++;
 
+	Prescaler--;
+
+	if(Prescaler == 0)
+	{
+		Prescaler=100;
+
+		Convert_Pos();
+	}
   /* USER CODE END SysTick_IRQn 1 */
 }
 
