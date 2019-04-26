@@ -61,7 +61,8 @@ extern Pen_Holder Pen_Point;
 #define NPEN !(0x0080&PEN)  //!PEN
 
 
-uint32_t TPReadX(void);
+void TPReadX(uint32_t *X, uint32_t *Y);
+void GUI_TOUCH_X_MeasureXY(uint32_t *sumx, uint32_t *sumy);
 unsigned short int TPReadY(void);
 unsigned short int read_once(void);
 

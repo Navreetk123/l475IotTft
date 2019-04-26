@@ -104,6 +104,8 @@ static void MX_CRC_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 
+uint32_t potx = 0;
+uint32_t poty = 0;
 
 /* USER CODE END PFP */
 
@@ -149,9 +151,9 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_CRC_Init();
-//  MX_ADC1_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
 
   InitLCD_ILI9341();
 
@@ -199,6 +201,7 @@ int main(void)
 
   int count=0;
   char countString[10];
+  char touchString[20];
 
   /* USER CODE END 2 */
 
@@ -211,24 +214,39 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  GUI_DispDecAt(count, 20,20,5);
+	  GUI_DispDecAt(count, 20,20,4);
 
 	  sprintf(countString, "%d", count);
 
-	  PROGBAR_SetValue(hProgbar, count/1000);		//use dec value for bar position
+	  PROGBAR_SetValue(hProgbar, count/100);		//use dec value for bar position
 	  PROGBAR_SetText(hProgbar, countString); 		//use string for text on progress bar
 
-//	  GUI_DispDecAt(pfGetPENIRQ(), 200,50,3);
+	  GUI_TOUCH_X_MeasureXY(&potx, &poty);
+//	  TPReadX(&potx, &poty);
+	  GUI_DispDecAt(potx, 100,50,4);
+	  GUI_DispDecAt(poty, 200,50,4);
 
-//	  if(pfGetPENIRQ())
-//	  {
-//		  GUI_DispDecAt(GUI_TOUCH_X_MeasureX(), 200,20,5);
-//	  }
+//	  sprintf(touchString, "%ld     %ld", potx, poty);
+//	  GUI_DispStringAt("                      ", 150, 50);
+//	  GUI_DispStringAt(touchString, 150, 50);
+
+	  potx=0;
+	  poty=0;
+
+	  if(pfGetPENIRQ())
+	  {
+		  GUI_DispStringAt("P", 200,20);
+//		  GUI_DispDecAt(TPReadX(), 200,50,4);
+	  }
+	  else
+	  {
+		  GUI_DispStringAt("   ", 200,20);
+	  }
 
 
 	  GUI_Exec();
 
-	  if (count++ > 99999) {
+	  if (++count > 9999) {
 	  count = 0;
 	  }
 
@@ -732,12 +750,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_CS_Pin LCD_RS_Pin */
-  GPIO_InitStruct.Pin = LCD_CS_Pin|LCD_RS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : ARD_D1_Pin ARD_D0_Pin */
