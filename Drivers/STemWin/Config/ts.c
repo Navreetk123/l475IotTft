@@ -2,6 +2,8 @@
 #include "main.h"
 
 extern ADC_HandleTypeDef hadc1;
+extern uint32_t potx;
+extern uint32_t poty;
 
 Pen_Holder Pen_Point;
 
@@ -12,7 +14,7 @@ int GUI_TOUCH_X_MeasureX()
 {
 	  unsigned short i;
 	  unsigned short sum=0;
-	  for(i=0;i<8;i++)
+	  for(i=0;i<8;i++);
 //	   	sum+=TPReadX();
 	  return sum>>3;
 
@@ -252,44 +254,36 @@ void TPReadX(uint32_t *X, uint32_t *Y)
 }
 
 
-#define TSLEFT 137
-#define TSRIGHT 1909
-#define TSTOP 161
-#define TSBOTTOM 1850
+#define TSLEFT 3520
+#define TSRIGHT 450
+#define TSTOP 3515
+#define TSBOTTOM 580
 
 //hard code these so not to recalculate every time
 //#define XDIVISOR (TSRIGHT-TSLEFT)/320
 //#define YDIVISOR (TSBOTTOM-TSTOP)/240
 
-#ifdef ILI9481
 
-#define XDIVISOR 3.69  	//TSRIGHT-TSLEFT)/480
-#define YDIVISOR 5.28	//TSBOTTOM-TSTOP)/320
+#define XDIVISOR 9.59	//(TSRIGHT-TSLEFT)/320   	(3520-450)/320=9.59
+#define YDIVISOR 12.23	//(TSBOTTOM-TSTOP)/240		(3515-580)/240=12.23
 
-#elif SSD1963
-
-#define XDIVISOR 2.82  	//TSBOTTOM-TSTOP)/600
-#define YDIVISOR 2.22	//TSRIGHT-TSLEFT)/800
-
-#else
-
-#define XDIVISOR 5.54	//(TSRIGHT-TSLEFT)/320
-#define YDIVISOR 7.04	//(TSBOTTOM-TSTOP)/240
-
-#endif
 
 void Convert_Pos(void)
 {
-	Pen_Point.X=GUI_TOUCH_X_MeasureX();
-	Pen_Point.Y=GUI_TOUCH_X_MeasureY();
+//	Pen_Point.X=GUI_TOUCH_X_MeasureX();
+//	Pen_Point.Y=GUI_TOUCH_X_MeasureY();
 
-	Pen_Point.X0=(int)((Pen_Point.X-TSLEFT)/XDIVISOR); //widescreen xy, 00 upper left
-	Pen_Point.Y0=(int)((Pen_Point.Y-TSTOP)/YDIVISOR);
+	Pen_Point.X=potx;
+	Pen_Point.Y=poty;
+
+
+	Pen_Point.X0=(int)320-((Pen_Point.Y-TSRIGHT)/XDIVISOR); //widescreen xy, 00 upper left
+	Pen_Point.Y0=(int)240-((Pen_Point.X-TSBOTTOM)/YDIVISOR);
 
 	pstate.x = Pen_Point.X0;
 	pstate.y = Pen_Point.Y0;
 
-	if (HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_12))
+	if (pfGetPENIRQ())
 		pstate.Pressed = 0;		//pressed active lo
 	else
 		pstate.Pressed = 1;

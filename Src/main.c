@@ -223,8 +223,9 @@ int main(void)
 
 	  GUI_TOUCH_X_MeasureXY(&potx, &poty);
 //	  TPReadX(&potx, &poty);
-	  GUI_DispDecAt(potx, 100,50,4);
-	  GUI_DispDecAt(poty, 200,50,4);
+	  Convert_Pos();
+	  GUI_DispDecAt(pstate.x, 100,50,3);
+	  GUI_DispDecAt(pstate.y, 200,50,3);
 
 //	  sprintf(touchString, "%ld     %ld", potx, poty);
 //	  GUI_DispStringAt("                      ", 150, 50);
