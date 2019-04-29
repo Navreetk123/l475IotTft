@@ -245,10 +245,21 @@ int main(void)
 	  }
 
 
+
+
+	  if(BUTTON_IsPressed(hButton))
+  	  {
+		  GUI_DispStringAt("B", 210,80);
+	  }
+	  else
+	  {
+		  GUI_DispStringAt("     ", 210,80);
+	  }
+
 	  GUI_Exec();
 
 	  if (++count > 9999) {
-	  count = 0;
+		  count = 0;
 	  }
 
 
