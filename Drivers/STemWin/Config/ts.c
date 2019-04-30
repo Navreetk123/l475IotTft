@@ -2,32 +2,14 @@
 #include "main.h"
 
 extern ADC_HandleTypeDef hadc1;
-extern uint32_t potx;
-extern uint32_t poty;
+
 
 Pen_Holder Pen_Point;
 
 unsigned char flag=0;
 uint32_t x=0;
 
-int GUI_TOUCH_X_MeasureX()
-{
-	  unsigned short i;
-	  unsigned short sum=0;
-	  for(i=0;i<8;i++);
-//	   	sum+=TPReadX();
-	  return sum>>3;
 
-}
-
-int GUI_TOUCH_X_MeasureY()
-{
-	  unsigned short i;
-	  unsigned short sum=0;
-	  for(i=0;i<8;i++)
-	   	sum+=TPReadY();
-	  return sum>>3;
-}
 
 void GUI_TOUCH_X_MeasureXY(uint32_t *sumx, uint32_t *sumy)
 {
@@ -37,7 +19,7 @@ void GUI_TOUCH_X_MeasureXY(uint32_t *sumx, uint32_t *sumy)
 
 	  for(i=0;i<8;i++)
 	  {
-	   	TPReadX(&x, &y);
+	   	TPReadXY(&x, &y);
 	   	(*sumx)+=x;
 	   	(*sumy)+=y;
 	  }
@@ -46,68 +28,6 @@ void GUI_TOUCH_X_MeasureXY(uint32_t *sumx, uint32_t *sumy)
 	  *sumy = (*sumy)>>3;
 }
 
-char pfGetPENIRQ()
-{
-
-// Y1_Pin LCD_CS_Pin //A3 	need two analog inputs
-// X1_Pin LCD_RS_Pin //A2
-// Y2_Pin LCD_D1_Pin //9
-// X2_Pin LCD_D0_Pin //8
-
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	uint8_t touch=0;
-
-	//test for touch
-//	HAL_GPIO_WritePin(Y1_PORT,Y1_Pin, GPIO_PIN_SET);
-
-	//Configure GPIO pins :Y1_Pin digital input - no pullup
-	GPIO_InitStruct.Pin = Y1_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(Y1_PORT, &GPIO_InitStruct);
-
-	//Configure GPIO pins :Y2_Pin digital input - pullup
-//	GPIO_InitStruct.Pin = Y2_Pin;
-//	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-//	GPIO_InitStruct.Pull = GPIO_PULLUP;
-//	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-//	HAL_GPIO_Init(Y2_PORT, &GPIO_InitStruct);
-
-
-	HAL_GPIO_WritePin(X1_PORT,X1_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(X2_PORT,X2_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(Y2_PORT,Y2_Pin, GPIO_PIN_SET);
-
-
-	touch = HAL_GPIO_ReadPin(Y1_PORT, Y1_Pin);
-
-
-	//Configure GPIO pins :Y2_Pin digital output
-	GPIO_InitStruct.Pin = Y1_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(Y1_PORT, &GPIO_InitStruct);
-
-	HAL_GPIO_WritePin(X1_PORT,X1_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(X2_PORT,X2_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(Y2_PORT,Y2_Pin, GPIO_PIN_RESET);
-
-	return touch; //active lo  - returns 0 if pressed
-
-}
-
-
-
-
-unsigned short int TPReadY(void)
-{
-	unsigned short int y=0;
-
-
-	return y;
-}
 
 
 /* USER CODE BEGIN 4 */
@@ -118,7 +38,7 @@ unsigned short int TPReadY(void)
 // X2_Pin LCD_D0_Pin //8
 
 
-void TPReadX(uint32_t *X, uint32_t *Y)
+void TPReadXY(uint32_t *X, uint32_t *Y)
 {
 
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -267,8 +187,11 @@ void TPReadX(uint32_t *X, uint32_t *Y)
 
 void Convert_Pos(void)
 {
-//	Pen_Point.X=GUI_TOUCH_X_MeasureX();
-//	Pen_Point.Y=GUI_TOUCH_X_MeasureY();
+
+	uint32_t potx = 0;
+	uint32_t poty = 0;
+
+	GUI_TOUCH_X_MeasureXY(&potx, &poty);
 
 	Pen_Point.X=potx;
 	Pen_Point.Y=poty;

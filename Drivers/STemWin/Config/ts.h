@@ -57,15 +57,9 @@ typedef struct
 extern Pen_Holder Pen_Point;
 
 
-#define PEN  GPIOB->IDR&(1<<12) //
-#define NPEN !(0x0080&PEN)  //!PEN
 
-
-void TPReadX(uint32_t *X, uint32_t *Y);
+void TPReadXY(uint32_t *X, uint32_t *Y);
 void GUI_TOUCH_X_MeasureXY(uint32_t *sumx, uint32_t *sumy);
-unsigned short int TPReadY(void);
-unsigned short int read_once(void);
-
 
 void EXTI9_5_IRQHandler(void);
 void NVIC_TOUCHConfiguration(void);
@@ -73,7 +67,7 @@ void touch_init(void);
 
 void Convert_Pos(void);
 void Touch_Adjust(void);
-void Convert_Pos(void);
+
 
 #define Key_Down 0x01
 #define Key_Up   0x00

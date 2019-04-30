@@ -104,8 +104,6 @@ static void MX_CRC_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 
-uint32_t potx = 0;
-uint32_t poty = 0;
 
 /* USER CODE END PFP */
 
@@ -123,6 +121,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	PROGBAR_Handle hProgbar;
 	BUTTON_Handle hButton;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -221,8 +220,6 @@ int main(void)
 	  PROGBAR_SetValue(hProgbar, count/100);		//use dec value for bar position
 	  PROGBAR_SetText(hProgbar, countString); 		//use string for text on progress bar
 
-	  GUI_TOUCH_X_MeasureXY(&potx, &poty);
-//	  TPReadX(&potx, &poty);
 	  Convert_Pos();
 	  GUI_DispDecAt(pstate.x, 100,50,3);
 	  GUI_DispDecAt(pstate.y, 200,50,3);
@@ -231,8 +228,6 @@ int main(void)
 //	  GUI_DispStringAt("                      ", 150, 50);
 //	  GUI_DispStringAt(touchString, 150, 50);
 
-	  potx=0;
-	  poty=0;
 
 	  if(pstate.Pressed)
 	  {

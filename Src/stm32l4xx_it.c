@@ -61,7 +61,7 @@
 /* USER CODE BEGIN PV */
 extern volatile GUI_TIMER_TIME OS_TimeMS;
 
-char Prescaler = 100;
+uint8_t Prescaler = 100;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
