@@ -234,7 +234,7 @@ int main(void)
 	  potx=0;
 	  poty=0;
 
-	  if(pfGetPENIRQ())
+	  if(pstate.Pressed)
 	  {
 		  GUI_DispStringAt("P", 200,20);
 //		  GUI_DispDecAt(TPReadX(), 200,50,4);

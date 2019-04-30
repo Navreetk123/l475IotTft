@@ -94,10 +94,7 @@ char pfGetPENIRQ()
 	HAL_GPIO_WritePin(X2_PORT,X2_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(Y2_PORT,Y2_Pin, GPIO_PIN_RESET);
 
-	if(!touch) //active low
-		return 1;
-	else
-		return 0;
+	return touch; //active lo  - returns 0 if pressed
 
 }
 
@@ -283,11 +280,14 @@ void Convert_Pos(void)
 	pstate.x = Pen_Point.X0;
 	pstate.y = Pen_Point.Y0;
 
-	if (pfGetPENIRQ())
-		pstate.Pressed = 0;		//pressed active lo
+	if(pstate.x || pstate.y)
+		pstate.Pressed = 1;		//pressed active lo   pfGetPENIRQ() works for button
 	else
-		pstate.Pressed = 1;
+		pstate.Pressed = 0;
 
 	GUI_PID_StoreState(&pstate);
+
+
+
 }
 
