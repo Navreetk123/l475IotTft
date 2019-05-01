@@ -121,6 +121,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	PROGBAR_Handle hProgbar;
 	BUTTON_Handle hButton;
+//	SLIDER_Handle hSlider;
 
   /* USER CODE END 1 */
 
@@ -186,11 +187,11 @@ int main(void)
   /* Set progress bar text */
   PROGBAR_SetText(hProgbar, "...");
 
+//  SLIDER_SetDefaultSkin(SLIDER_SKIN_FLEX);
+//  hSlider = SLIDER_CreateEx(50, 210, 219, 30, 0, WM_CF_SHOW, 0, GUI_ID_SLIDER0);
 
   // Create the button
   hButton = BUTTON_CreateEx(120, 100, 80, 60, 0, WM_CF_SHOW, 0, GUI_ID_BUTTON0);
-
-
 
 
   BUTTON_SetFont(hButton, &GUI_Font8x16);
@@ -201,6 +202,17 @@ int main(void)
   int count=0;
   char countString[10];
   char touchString[20];
+
+
+  //calibrate screen
+#define TSLEFT 3520
+#define TSRIGHT 450
+#define TSTOP 3515
+#define TSBOTTOM 580
+
+
+  GUI_TOUCH_Calibrate(GUI_COORD_X, 0, 319, TSLEFT, TSRIGHT);
+  GUI_TOUCH_Calibrate(GUI_COORD_Y, 0, 239, TSTOP, TSBOTTOM);
 
   /* USER CODE END 2 */
 
@@ -220,9 +232,14 @@ int main(void)
 	  PROGBAR_SetValue(hProgbar, count/100);		//use dec value for bar position
 	  PROGBAR_SetText(hProgbar, countString); 		//use string for text on progress bar
 
-	  Convert_Pos();
+//	  Convert_Pos();
+	  GUI_TOUCH_GetState(&pstate);  /* Get the touch position in pixel */
 	  GUI_DispDecAt(pstate.x, 100,50,3);
 	  GUI_DispDecAt(pstate.y, 200,50,3);
+
+//	  GUI_DispDecAt(GUI_TOUCH_GetxPhys(), 100,50,3);
+//	  GUI_DispDecAt(GUI_TOUCH_GetyPhys(), 200,50,3);
+
 
 //	  sprintf(touchString, "%ld     %ld", potx, poty);
 //	  GUI_DispStringAt("                      ", 150, 50);
@@ -251,12 +268,29 @@ int main(void)
 		  GUI_DispStringAt("     ", 210,80);
 	  }
 
+
+//	  char * apText[] = {
+//	  "Monday",
+//	  "Tuesday",
+//	  "Wednesday",
+//	  "Thursday",
+//	  "Friday",
+//	  "Saturday",
+//	  "Sunday",
+//	  NULL
+//	  };
+//	  LISTWHEEL_CreateEx(10, 10, 100, 100, WM_HBKWIN, WM_CF_SHOW,
+//	  0, GUI_ID_LISTWHEEL0, apText);
+
+//	  SLIDER_SetValue(hSlider,SLIDER_GetValue(hSlider));
+
 	  GUI_Exec();
 
 	  if (++count > 9999) {
 		  count = 0;
 	  }
 
+	  GUI_TOUCH_Exec();
 
   }
   /* USER CODE END 3 */

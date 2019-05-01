@@ -56,7 +56,10 @@ typedef struct
 
 extern Pen_Holder Pen_Point;
 
-
+void GUI_TOUCH_X_ActivateX(void);
+void GUI_TOUCH_X_ActivateY(void);
+int GUI_TOUCH_X_MeasureX(void);
+int GUI_TOUCH_X_MeasureY(void);
 
 void TPReadXY(uint32_t *X, uint32_t *Y);
 void GUI_TOUCH_X_MeasureXY(uint32_t *sumx, uint32_t *sumy);
