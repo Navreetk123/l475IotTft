@@ -60,7 +60,6 @@
 /* Private defines */
 
 
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

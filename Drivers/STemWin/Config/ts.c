@@ -25,7 +25,7 @@ void GUI_TOUCH_X_ActivateY(void)
 // Y2_Pin LCD_D1_Pin //9
 // X2_Pin LCD_D0_Pin //8
 
-int GUI_TOUCH_X_MeasureX(void)
+int GUI_TOUCH_X_MeasureY(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -104,7 +104,7 @@ int GUI_TOUCH_X_MeasureX(void)
 }
 
 
-int GUI_TOUCH_X_MeasureY(void)
+int GUI_TOUCH_X_MeasureX(void)
 {
 	  //Y
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
