@@ -86,7 +86,9 @@ UART_HandleTypeDef huart3;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-
+const GUI_BITMAP bmlemmling_Cartoon_penguin_small;
+GUI_CONST_STORAGE GUI_BITMAP bmledCircleOrange;
+GUI_HSPRITE hSprite;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,6 +124,10 @@ int main(void)
 	BUTTON_Handle hButton;
 //	SLIDER_Handle hSlider;
 
+
+
+	int cx=20;
+	int cy=60;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -196,11 +202,17 @@ int main(void)
   BUTTON_SetFont(hButton, &GUI_Font8x16);
   // Set the button text
   BUTTON_SetText(hButton, "Test");
-  GUI_Exec();
+//  GUI_Exec();
+
+
+  hSprite = GUI_SPRITE_Create(&bmlemmling_Cartoon_penguin_small, 20,60);
+//  hSprite = GUI_SPRITE_Create(&bmledCircleOrange, cx-47, cy-47);
+//  GUI_Exec();
+
 
   int count=0;
   char countString[10];
-  char touchString[20];
+//  char touchString[20];
 
 
   //calibrate screen
@@ -223,6 +235,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//	  GUI_PID_GetCurrentState(&pstate);
 
 	  GUI_DispDecAt(count, 20,20,4);
 
@@ -249,10 +262,12 @@ int main(void)
 	  {
 		  GUI_DispStringAt("P", 200,20);
 //		  GUI_DispDecAt(TPReadX(), 200,50,4);
+//		  GUI_SPRITE_Show(hSprite);
 	  }
 	  else
 	  {
 		  GUI_DispStringAt("   ", 200,20);
+//		  GUI_SPRITE_Hide(hSprite);
 	  }
 
 
@@ -267,7 +282,13 @@ int main(void)
 		  GUI_DispStringAt("     ", 210,80);
 	  }
 
+///	  GUI_SPRITE_SetPosition(hSprite, (int16_t)cx, (int16_t)cy);
 
+
+		cx++;
+		cy++;
+		cx%=320+30;
+		cy%=240+30;
 //	  char * apText[] = {
 //	  "Monday",
 //	  "Tuesday",
@@ -290,7 +311,7 @@ int main(void)
 	  }
 
 	  GUI_TOUCH_Exec();
-
+//	  GUI_Clear();
   }
   /* USER CODE END 3 */
 }
