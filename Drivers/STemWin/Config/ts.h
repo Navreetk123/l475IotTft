@@ -42,7 +42,10 @@ typedef struct
 }Pen_Holder;
 
 // Touchscreen connection:
+#ifndef SHIELD
 
+#define ADC_CHANNEL_Y1 ADC_CHANNEL_3
+#define ADC_CHANNEL_X1 ADC_CHANNEL_4
 #define Y1_Pin LCD_CS_Pin //A3 	need two analog inputs
 #define X1_Pin LCD_RS_Pin //A2
 #define Y2_Pin LCD_D1_Pin //9
@@ -53,6 +56,21 @@ typedef struct
 #define Y2_PORT LCD_D1_GPIO_Port
 #define X2_PORT LCD_D0_GPIO_Port
 
+#else
+
+#define ADC_CHANNEL_Y1 ADC_CHANNEL_13
+#define ADC_CHANNEL_X1 ADC_CHANNEL_4
+#define Y1_Pin LCD_WR_Pin //A1 	need two analog inputs
+#define X1_Pin LCD_RS_Pin //A2
+#define Y2_Pin LCD_D7_Pin //7
+#define X2_Pin LCD_D6_Pin //6
+
+#define Y1_PORT LCD_WR_GPIO_Port
+#define X1_PORT LCD_RS_GPIO_Port
+#define Y2_PORT LCD_D7_GPIO_Port
+#define X2_PORT LCD_D6_GPIO_Port
+
+#endif
 
 extern Pen_Holder Pen_Point;
 

@@ -129,6 +129,7 @@ int main(void)
 	int cx=20;
 	int cy=60;
   /* USER CODE END 1 */
+  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -216,14 +217,27 @@ int main(void)
 
 
   //calibrate screen
+#ifndef SHIELD
+
 #define TSLEFT 3520
 #define TSRIGHT 450
 #define TSTOP 3515
 #define TSBOTTOM 580
 
+#else
+
+#define TSLEFT 450
+#define TSRIGHT 3520
+#define TSTOP 3515
+#define TSBOTTOM 580
+
+#endif
+
 
   GUI_TOUCH_Calibrate(GUI_COORD_X, 0, 319, TSLEFT, TSRIGHT);
   GUI_TOUCH_Calibrate(GUI_COORD_Y, 0, 239, TSTOP, TSBOTTOM);
+
+
 
   /* USER CODE END 2 */
 
@@ -235,7 +249,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  GUI_PID_GetCurrentState(&pstate);
+	  GUI_PID_GetCurrentState(&pstate);
 
 	  GUI_DispDecAt(count, 20,20,4);
 
@@ -252,6 +266,8 @@ int main(void)
 //	  GUI_DispDecAt(GUI_TOUCH_GetxPhys(), 100,50,3);
 //	  GUI_DispDecAt(GUI_TOUCH_GetyPhys(), 200,50,3);
 
+//	  GUI_DispDecAt(GUI_TOUCH_X_MeasureX(), 100,50,4);
+//	  GUI_DispDecAt(GUI_TOUCH_X_MeasureY(), 200,50,4);
 
 //	  sprintf(touchString, "%ld     %ld", potx, poty);
 //	  GUI_DispStringAt("                      ", 150, 50);

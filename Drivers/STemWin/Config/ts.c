@@ -22,8 +22,18 @@ void GUI_TOUCH_X_ActivateY(void)
 
 // Y1_Pin LCD_CS_Pin //A3 	need two analog inputs
 // X1_Pin LCD_RS_Pin //A2
-// Y2_Pin LCD_D1_Pin //9
-// X2_Pin LCD_D0_Pin //8
+// Y2_Pin LCD_D1_Pin //9 730ohms
+// X2_Pin LCD_D0_Pin //8 280ohms
+
+//#define YP A3  // must be an analog pin, use "An" notation!
+//#define XM A2  // must be an analog pin, use "An" notation!
+//#define YM 9   // can be a digital pin
+//#define XP 8   // can be a digital pin
+
+//#define YP A1  //must be an analog pin, use "An" notation!
+//#define XM A2  //must be an analog pin, use "An" notation!
+//#define YM 7   //can be a digital pin 647 ohms
+//#define XP 6   //can be a digital pin 322 ohms
 
 int GUI_TOUCH_X_MeasureY(void)
 {
@@ -36,7 +46,7 @@ int GUI_TOUCH_X_MeasureY(void)
 	//X
 
 	  /** Configure Regular Channel */
-	  sConfig.Channel = ADC_CHANNEL_3;
+	  sConfig.Channel = ADC_CHANNEL_Y1;
 	  sConfig.Rank = ADC_REGULAR_RANK_1;
 	  sConfig.SamplingTime = ADC_SAMPLETIME_247CYCLES_5;
 	  sConfig.SingleDiff = ADC_SINGLE_ENDED;
@@ -51,31 +61,31 @@ int GUI_TOUCH_X_MeasureY(void)
 	  GPIO_InitStruct.Pin = Y1_Pin;
 	  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
-	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	  HAL_GPIO_Init(Y1_PORT, &GPIO_InitStruct);
 
 	  //Configure GPIO pins : Y2 input with pullups
 	  GPIO_InitStruct.Pin = Y2_Pin;
 	  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	  GPIO_InitStruct.Pull = GPIO_PULLUP;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	  HAL_GPIO_Init(Y2_PORT, &GPIO_InitStruct);
 
 	  //Configure GPIO pins : X1_Pin output
 	  GPIO_InitStruct.Pin = X1_Pin;
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	  HAL_GPIO_Init(X1_PORT, &GPIO_InitStruct);
 
 	  //Configure GPIO pins : X2_Pin output
 	  GPIO_InitStruct.Pin = X2_Pin;
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	  HAL_GPIO_Init(X2_PORT, &GPIO_InitStruct);
 
-	  HAL_GPIO_WritePin(GPIOC,X1_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOB,X2_Pin, GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(X1_PORT,X1_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(X2_PORT,X2_Pin, GPIO_PIN_SET);
 
 	  HAL_Delay(1);
 
@@ -89,7 +99,7 @@ int GUI_TOUCH_X_MeasureY(void)
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	  HAL_GPIO_Init(Y1_PORT, &GPIO_InitStruct);
 
 
 	  //Configure GPIO pins : Y2 output
@@ -97,7 +107,7 @@ int GUI_TOUCH_X_MeasureY(void)
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	  HAL_GPIO_Init(Y2_PORT, &GPIO_InitStruct);
 
 	  return X;
 
@@ -113,7 +123,7 @@ int GUI_TOUCH_X_MeasureX(void)
 	  int Y=0;
 
 	  /** Configure Regular Channel */
-	  sConfig.Channel = ADC_CHANNEL_4;
+	  sConfig.Channel = ADC_CHANNEL_X1;
 	  sConfig.Rank = ADC_REGULAR_RANK_1;
 	  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
 	  sConfig.SingleDiff = ADC_SINGLE_ENDED;
@@ -129,7 +139,7 @@ int GUI_TOUCH_X_MeasureX(void)
 	  GPIO_InitStruct.Pin = X1_Pin;
 	  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
-	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	  HAL_GPIO_Init(X1_PORT, &GPIO_InitStruct);
 
 
 	  //Configure GPIO pins : X2 input with pullups
@@ -137,10 +147,10 @@ int GUI_TOUCH_X_MeasureX(void)
 	  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	  GPIO_InitStruct.Pull = GPIO_PULLUP;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	  HAL_GPIO_Init(X2_PORT, &GPIO_InitStruct);
 
-	  HAL_GPIO_WritePin(GPIOC,Y1_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA,Y2_Pin, GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(Y1_PORT,Y1_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(Y2_PORT,Y2_Pin, GPIO_PIN_SET);
 
 	  HAL_Delay(1);
 
@@ -154,7 +164,7 @@ int GUI_TOUCH_X_MeasureX(void)
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	  HAL_GPIO_Init(X1_PORT, &GPIO_InitStruct);
 
 
 	  //Configure GPIO pins : X2 output
@@ -162,7 +172,7 @@ int GUI_TOUCH_X_MeasureX(void)
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	  HAL_GPIO_Init(X2_PORT, &GPIO_InitStruct);
 
 	  return Y;
 }
