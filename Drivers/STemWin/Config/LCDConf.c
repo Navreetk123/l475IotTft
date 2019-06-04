@@ -157,6 +157,7 @@ void LcdWriteData(U8 Data) {
 void LcdWriteDataMultiple(U8 * pData, int NumItems) {
   while (NumItems--) {
     // ... TBD by user
+
 		HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);	//data mode
 
 		HAL_GPIO_WritePin(LCD_D7_GPIO_Port, LCD_D7_Pin, (*pData & 0b10000000) ? GPIO_PIN_SET : GPIO_PIN_RESET);
@@ -185,9 +186,88 @@ void LcdWriteDataMultiple(U8 * pData, int NumItems) {
 *   Reads multiple values from a display register.
 */
 void LcdReadDataMultiple(U8 * pData, int NumItems) {
+
+	  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	  HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET);	//data mode
+
+	  //Configure GPIO pins input
+	  GPIO_InitStruct.Pin = LCD_D7_Pin;
+	  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	  GPIO_InitStruct.Pull = GPIO_NOPULL;
+	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	  HAL_GPIO_Init(LCD_D7_GPIO_Port, &GPIO_InitStruct);
+
+	  GPIO_InitStruct.Pin = LCD_D6_Pin;
+	  HAL_GPIO_Init(LCD_D6_GPIO_Port, &GPIO_InitStruct);
+
+	  GPIO_InitStruct.Pin = LCD_D5_Pin;
+	  HAL_GPIO_Init(LCD_D5_GPIO_Port, &GPIO_InitStruct);
+
+	  GPIO_InitStruct.Pin = LCD_D4_Pin;
+	  HAL_GPIO_Init(LCD_D4_GPIO_Port, &GPIO_InitStruct);
+
+	  GPIO_InitStruct.Pin = LCD_D3_Pin;
+	  HAL_GPIO_Init(LCD_D3_GPIO_Port, &GPIO_InitStruct);
+
+	  GPIO_InitStruct.Pin = LCD_D2_Pin;
+	  HAL_GPIO_Init(LCD_D2_GPIO_Port, &GPIO_InitStruct);
+
+	  GPIO_InitStruct.Pin = LCD_D1_Pin;
+	  HAL_GPIO_Init(LCD_D1_GPIO_Port, &GPIO_InitStruct);
+
+	  GPIO_InitStruct.Pin = LCD_D0_Pin;
+	  HAL_GPIO_Init(LCD_D0_GPIO_Port, &GPIO_InitStruct);
+
   while (NumItems--) {
     // ... TBD by user
+	  uint8_t LCD_Data = 0;
+
+	  HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_RESET); 			//enable RD
+
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D7_GPIO_Port, LCD_D7_Pin) << 7;
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D6_GPIO_Port, LCD_D6_Pin) << 6;
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D5_GPIO_Port, LCD_D5_Pin) << 5;
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D4_GPIO_Port, LCD_D4_Pin) << 4;
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D3_GPIO_Port, LCD_D3_Pin) << 3;
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D2_GPIO_Port, LCD_D2_Pin) << 2;
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D1_GPIO_Port, LCD_D1_Pin) << 1;
+	  LCD_Data |= HAL_GPIO_ReadPin(LCD_D0_GPIO_Port, LCD_D0_Pin);
+
+	  HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_SET); 			//disable RD
+
+	  *pData++ = LCD_Data;
+
+
   }
+
+  //Configure GPIO pins back to output
+  GPIO_InitStruct.Pin = LCD_D7_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LCD_D7_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LCD_D6_Pin;
+  HAL_GPIO_Init(LCD_D6_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LCD_D5_Pin;
+  HAL_GPIO_Init(LCD_D5_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LCD_D4_Pin;
+  HAL_GPIO_Init(LCD_D4_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LCD_D3_Pin;
+  HAL_GPIO_Init(LCD_D3_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LCD_D2_Pin;
+  HAL_GPIO_Init(LCD_D2_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LCD_D1_Pin;
+  HAL_GPIO_Init(LCD_D1_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LCD_D0_Pin;
+  HAL_GPIO_Init(LCD_D0_GPIO_Port, &GPIO_InitStruct);
 }
 
 /*********************************************************************
@@ -222,6 +302,10 @@ void LCD_X_Config(void) {
   // Orientation
   //
   Config.Orientation = GUI_SWAP_XY | GUI_MIRROR_Y;
+
+  //mel
+  Config.NumDummyReads = 1;  //needed for ili9341 shield
+
   GUIDRV_FlexColor_Config(pDevice, &Config);
   //
   // Set controller and operation mode
@@ -231,6 +315,7 @@ void LCD_X_Config(void) {
   PortAPI.pfWriteM8_A1 = LcdWriteDataMultiple;
   PortAPI.pfReadM8_A1  = LcdReadDataMultiple;
   GUIDRV_FlexColor_SetFunc(pDevice, &PortAPI, GUIDRV_FLEXCOLOR_F66709, GUIDRV_FLEXCOLOR_M16C0B8);
+//  GUIDRV_FlexColor_SetReadFunc66709_B16(pDevice, GUIDRV_FLEXCOLOR_READ_FUNC_II);
 
 }
 

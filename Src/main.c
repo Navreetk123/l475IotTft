@@ -298,7 +298,7 @@ int main(void)
 		  GUI_DispStringAt("     ", 210,80);
 	  }
 
-///	  GUI_SPRITE_SetPosition(hSprite, (int16_t)cx, (int16_t)cy);
+	  GUI_SPRITE_SetPosition(hSprite, (int16_t)cx, (int16_t)cy);
 
 
 		cx++;
