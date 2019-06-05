@@ -125,9 +125,13 @@ int main(void)
 //	SLIDER_Handle hSlider;
 
 
+	int posx = 20;
+	int posy = 60;
+	int cx=1;
+	int cy=1;
+	int accelx = 1;
+	int accely = 1;
 
-	int cx=20;
-	int cy=60;
   /* USER CODE END 1 */
   
 
@@ -206,7 +210,7 @@ int main(void)
 //  GUI_Exec();
 
 
-  hSprite = GUI_SPRITE_Create(&bmlemmling_Cartoon_penguin_small, 20,60);
+  hSprite = GUI_SPRITE_Create(&bmlemmling_Cartoon_penguin_small, posx,posy);
 //  hSprite = GUI_SPRITE_Create(&bmledCircleOrange, cx-47, cy-47);
 //  GUI_Exec();
 
@@ -238,15 +242,13 @@ int main(void)
   GUI_TOUCH_Calibrate(GUI_COORD_Y, 0, 239, TSTOP, TSBOTTOM);
 
 
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-    /* USER CODE END WHILE */
+   /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 	  GUI_PID_GetCurrentState(&pstate);
@@ -298,13 +300,35 @@ int main(void)
 		  GUI_DispStringAt("     ", 210,80);
 	  }
 
-	  GUI_SPRITE_SetPosition(hSprite, (int16_t)cx, (int16_t)cy);
 
 
-		cx++;
-		cy++;
-		cx%=320+30;
-		cy%=240+30;
+		if(posx>320-60)
+		{
+			accelx = -1;
+		}
+
+
+		if(posy>240-60)
+		{
+			accely = -1;
+		}
+
+		if(posx<0)
+		{
+			accelx = 1;
+		}
+
+		if(posy<0)
+		{
+			accely = 1;
+		}
+
+		posx = posx + (cx * accelx);
+		posy = posy + (cy * accely);
+
+	  GUI_SPRITE_SetPosition(hSprite, (int16_t)posx, (int16_t)posy);
+
+
 //	  char * apText[] = {
 //	  "Monday",
 //	  "Tuesday",
@@ -317,7 +341,7 @@ int main(void)
 //	  };
 //	  LISTWHEEL_CreateEx(10, 10, 100, 100, WM_HBKWIN, WM_CF_SHOW,
 //	  0, GUI_ID_LISTWHEEL0, apText);
-
+//
 //	  SLIDER_SetValue(hSlider,SLIDER_GetValue(hSlider));
 
 	  GUI_Exec();
