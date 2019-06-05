@@ -50,6 +50,9 @@ Purpose     : Display controller configuration (single layer)
 #include "GUIDRV_FlexColor.h"
 #include "main.h"
 #include "LCDConf.h"
+#include "GUITDRV_ADS7846.h"
+
+GUITDRV_ADS7846_CONFIG pConfig;
 
 /*********************************************************************
 *
@@ -64,6 +67,38 @@ Purpose     : Display controller configuration (single layer)
 #define XSIZE_PHYS  240 // To be adapted to x-screen size
 #define YSIZE_PHYS  320 // To be adapted to y-screen size
 
+/* Color conversion */
+#define COLOR_CONVERSION    GUICC_565
+
+/* Display driver */
+//#define DISPLAY_DRIVER GUIDRV_COMPACT_COLOR_16 //EmWin
+#define DISPLAY_DRIVER GUIDRV_FLEXCOLOR			 //STemWin
+
+// Buffers / VScreens
+//
+#define NUM_BUFFERS   1
+#define NUM_VSCREENS  1
+
+//
+// Display orientation
+//
+
+#define DISPLAY_ORIENTATION  GUI_SWAP_XY | GUI_MIRROR_Y
+
+//
+// Touch screen
+//
+#define USE_TOUCH   1
+//
+// 	Touch screen calibration
+//	calibrate screen
+
+#define TOUCH_X_MIN 450
+#define TOUCH_X_MAX 3520
+#define TOUCH_Y_MIN 580
+#define TOUCH_Y_MAX 3515
+
+
 /*********************************************************************
 *
 *       Configuration checking
@@ -76,6 +111,9 @@ Purpose     : Display controller configuration (single layer)
 #ifndef   VYSIZE_PHYS
   #define VYSIZE_PHYS YSIZE_PHYS
 #endif
+
+
+
 #ifndef   XSIZE_PHYS
   #error Physical X size of display is not defined!
 #endif
@@ -87,6 +125,81 @@ Purpose     : Display controller configuration (single layer)
 #endif
 #ifndef   GUIDRV_FLEXCOLOR
   #error No display driver defined!
+#endif
+
+#ifndef   NUM_VSCREENS
+  #define NUM_VSCREENS 1
+#else
+  #if (NUM_VSCREENS <= 0)
+    #error At least one screeen needs to be defined!
+  #endif
+#endif
+#if (NUM_VSCREENS > 1) && (NUM_BUFFERS > 1)
+  #error Virtual screens and multiple buffers are not allowed!
+#endif
+
+#ifndef   LCD_SWAP_XY
+  #define LCD_SWAP_XY 0
+#endif
+#if LCD_SWAP_XY
+  #define LCD_XSIZE YSIZE_PHYS
+  #define LCD_YSIZE XSIZE_PHYS
+#else
+  #define LCD_XSIZE XSIZE_PHYS
+  #define LCD_YSIZE YSIZE_PHYS
+#endif
+#define LCD_VXSIZE LCD_XSIZE
+#define LCD_VYSIZE LCD_YSIZE
+
+
+#ifndef   DISPLAY_ORIENTATION
+  #define DISPLAY_ORIENTATION  0
+#endif
+
+#if ((DISPLAY_ORIENTATION & GUI_SWAP_XY) != 0)
+#define LANDSCAPE   1
+#else
+#define LANDSCAPE   0
+#endif
+
+#if (LANDSCAPE == 1)
+#define WIDTH       YSIZE_PHYS  /* Screen Width (in pixels)         */
+#define HEIGHT      XSIZE_PHYS  /* Screen Hight (in pixels)         */
+#else
+#define WIDTH       XSIZE_PHYS  /* Screen Width (in pixels)         */
+#define HEIGHT      YSIZE_PHYS  /* Screen Hight (in pixels)         */
+#endif
+
+#if ((DISPLAY_ORIENTATION & GUI_SWAP_XY) != 0)
+  #if ((DISPLAY_ORIENTATION & GUI_MIRROR_X) != 0)
+    #define TOUCH_TOP    TOUCH_X_MAX
+    #define TOUCH_BOTTOM TOUCH_X_MIN
+  #else
+    #define TOUCH_TOP    TOUCH_X_MIN
+    #define TOUCH_BOTTOM TOUCH_X_MAX
+  #endif
+  #if ((DISPLAY_ORIENTATION & GUI_MIRROR_Y) != 0)
+    #define TOUCH_LEFT   TOUCH_Y_MAX
+    #define TOUCH_RIGHT  TOUCH_Y_MIN
+  #else
+    #define TOUCH_LEFT   TOUCH_Y_MIN
+    #define TOUCH_RIGHT  TOUCH_Y_MAX
+  #endif
+#else
+  #if ((DISPLAY_ORIENTATION & GUI_MIRROR_X) != 0)
+    #define TOUCH_LEFT   TOUCH_X_MAX
+    #define TOUCH_RIGHT  TOUCH_X_MIN
+  #else
+    #define TOUCH_LEFT   TOUCH_X_MIN
+    #define TOUCH_RIGHT  TOUCH_X_MAX
+  #endif
+  #if ((DISPLAY_ORIENTATION & GUI_MIRROR_Y) != 0)
+    #define TOUCH_TOP    TOUCH_Y_MAX
+    #define TOUCH_BOTTOM TOUCH_Y_MIN
+  #else
+    #define TOUCH_TOP    TOUCH_Y_MIN
+    #define TOUCH_BOTTOM TOUCH_Y_MAX
+  #endif
 #endif
 
 /*********************************************************************
@@ -292,7 +405,7 @@ void LCD_X_Config(void) {
   //
   // Set display driver and color conversion
   //
-  pDevice = GUI_DEVICE_CreateAndLink(GUIDRV_FLEXCOLOR, GUICC_565, 0, 0);
+  pDevice = GUI_DEVICE_CreateAndLink(GUIDRV_FLEXCOLOR, COLOR_CONVERSION, 0, 0);
   //
   // Display driver configuration, required for Lin-driver
   //
@@ -301,7 +414,7 @@ void LCD_X_Config(void) {
   //
   // Orientation
   //
-  Config.Orientation = GUI_SWAP_XY | GUI_MIRROR_Y;
+  Config.Orientation = DISPLAY_ORIENTATION; //GUI_SWAP_XY | GUI_MIRROR_Y;
 
   //mel
   Config.NumDummyReads = 1;  //needed for ili9341 shield
@@ -315,8 +428,49 @@ void LCD_X_Config(void) {
   PortAPI.pfWriteM8_A1 = LcdWriteDataMultiple;
   PortAPI.pfReadM8_A1  = LcdReadDataMultiple;
   GUIDRV_FlexColor_SetFunc(pDevice, &PortAPI, GUIDRV_FLEXCOLOR_F66709, GUIDRV_FLEXCOLOR_M16C0B8);
-//  GUIDRV_FlexColor_SetReadFunc66709_B16(pDevice, GUIDRV_FLEXCOLOR_READ_FUNC_II);
 
+  //
+  // Display driver configuration
+  //
+ if (LCD_GetSwapXY()) {
+    LCD_SetSizeEx (0, YSIZE_PHYS, XSIZE_PHYS);
+    LCD_SetVSizeEx(0, YSIZE_PHYS * NUM_VSCREENS, XSIZE_PHYS);
+  } else {
+    LCD_SetSizeEx (0, XSIZE_PHYS, YSIZE_PHYS);
+    LCD_SetVSizeEx(0, XSIZE_PHYS, YSIZE_PHYS * NUM_VSCREENS);
+  }
+
+
+#if (USE_TOUCH == 1)
+
+#ifndef SHIELD
+ 	 pConfig.Orientation = GUI_SWAP_XY;
+#else
+	 pConfig.Orientation = GUI_SWAP_XY | GUI_MIRROR_Y;		//shield XMAX on left
+#endif
+	 // - Orientation: Orientation of the touch screen if not the same as the physical orientation.
+	 //                 A or-combination of the defines GUI_SWAP_XY, GUI_MIRROR_X and GUI_MIRROR_Y
+	 //                 can be used.
+	 pConfig.xLog0 = 0; 				// - xLog0      : Logical pixel value of horizontal reference point 0. Typically 0.
+	 pConfig.xLog1 = XSIZE_PHYS -1; 	// - xLog1      : Logical pixel value of horizontal reference point 1. Typically horizontal screen resolution -1.
+	 pConfig.xPhys0 = TOUCH_LEFT;		// - xPhys0     : Physical AD value of horizontal reference point 0.
+	 pConfig.xPhys1 = TOUCH_RIGHT;		// - xPhys1     : Physical AD value of horizontal reference point 1.
+	 pConfig.yLog0 = 0;					// - yLog0      : Logical pixel value of vertical reference point 0. Typically 0.
+	 pConfig.yLog1 = YSIZE_PHYS - 1;	// - yLog1      : Logical pixel value of vertical reference point 1. Typically vertical screen resolution -1.
+	 pConfig.yPhys0 = TOUCH_TOP;		// - yPhys0     : Physical AD value of vertical reference point 0.
+	 pConfig.xPhys1 = TOUCH_BOTTOM;		// - yPhys1     : Physical AD value of vertical reference point 1.
+
+	    // Set orientation of touch screen
+	    //
+	    GUI_TOUCH_SetOrientation(pConfig.Orientation);
+
+	    //
+	    // Calibrate touch screen
+	    //
+	    GUI_TOUCH_Calibrate(GUI_COORD_X, 0, WIDTH  - 1, TOUCH_LEFT, TOUCH_RIGHT);
+	    GUI_TOUCH_Calibrate(GUI_COORD_Y, 0, HEIGHT - 1, TOUCH_TOP,  TOUCH_BOTTOM);
+
+#endif
 }
 
 /*********************************************************************
@@ -354,6 +508,8 @@ int LCD_X_DisplayDriver(unsigned LayerIndex, unsigned Cmd, void * pData) {
     // to be adapted by the customer...
     //
     // ...
+	  InitLCD_ILI9341();
+
     return 0;
   }
   default:
@@ -374,7 +530,7 @@ void InitLCD_ILI9341(void) {
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	  HAL_GPIO_Init(LCD_CS_GPIO_Port, &GPIO_InitStruct);
 
 	HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_SET); 			//disable RD

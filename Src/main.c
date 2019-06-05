@@ -165,8 +165,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
 
-  InitLCD_ILI9341();
-
   GUI_Init();
 
   GUI_SetFont(&GUI_Font8x16);
@@ -218,28 +216,6 @@ int main(void)
   int count=0;
   char countString[10];
 //  char touchString[20];
-
-
-  //calibrate screen
-#ifndef SHIELD
-
-#define TSLEFT 3520
-#define TSRIGHT 450
-#define TSTOP 3515
-#define TSBOTTOM 580
-
-#else
-
-#define TSLEFT 450
-#define TSRIGHT 3520
-#define TSTOP 3515
-#define TSBOTTOM 580
-
-#endif
-
-
-  GUI_TOUCH_Calibrate(GUI_COORD_X, 0, 319, TSLEFT, TSRIGHT);
-  GUI_TOUCH_Calibrate(GUI_COORD_Y, 0, 239, TSTOP, TSBOTTOM);
 
 
   /* USER CODE END 2 */
@@ -301,7 +277,7 @@ int main(void)
 	  }
 
 
-
+//sprite movement
 		if(posx>320-60)
 		{
 			accelx = -1;
@@ -350,7 +326,7 @@ int main(void)
 		  count = 0;
 	  }
 
-	  GUI_TOUCH_Exec();
+	  GUI_TOUCH_Exec(); //call each time through to get new touchscreen input
 //	  GUI_Clear();
   }
   /* USER CODE END 3 */
