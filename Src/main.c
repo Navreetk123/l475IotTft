@@ -1,5 +1,10 @@
 /* USER CODE BEGIN Header */
 /**
+ * Navreet Kaur
+ * Lab 5 ECET 260 TFT Display
+ * This Lab displays a text on the screen and changes the color of text when virtual button
+ *   on screen is touched or pressed.
+ * 6 Oct,2019
   ******************************************************************************
   * @file           : main.c
   * @brief          : Main program body
@@ -168,7 +173,7 @@ int main(void)
   GUI_Init();
 
   GUI_SetFont(&GUI_Font8x16);
-  GUI_SetBkColor(GUI_BLUE);
+  GUI_SetBkColor(GUI_LIGHTYELLOW);
   GUI_Clear();
 
   GUI_SetColor(GUI_CYAN);			//foreground or text color
@@ -177,10 +182,10 @@ int main(void)
   GUI_DispString(GUI_GetVersionString());
   GUI_DispString("\n\n\n");
 
-  GUI_SetFont(&GUI_Font32B_ASCII);
-  GUI_SetColor(GUI_WHITE);		//foreground or text color
+  GUI_SetFont(&GUI_FontComic24B_1);
+  GUI_SetColor(GUI_DARKRED);		//foreground or text color
 
-  GUI_DrawGradientH(5, 150, 315, 235, 0x0000FF, 0x00FFFF);
+  GUI_DrawGradientH(5, 150, 315, 235, 0x00FF00, 0xFF0000);
 
   PROGBAR_SetDefaultSkin(PROGBAR_SKIN_FLEX); // Sets the default skin for new widgets
 
@@ -194,17 +199,19 @@ int main(void)
 
   /* Set progress bar text */
   PROGBAR_SetText(hProgbar, "...");
-
+//  PROGBAR_SetBarColor(hProgbar,0,GUI_WHITE);
+//  PROGBAR_SetBarColor(hProgbar,0,GUI_BROWN);
+//  PROGBAR_SetValue(hProgbar, 50);
 //  SLIDER_SetDefaultSkin(SLIDER_SKIN_FLEX);
 //  hSlider = SLIDER_CreateEx(50, 210, 219, 30, 0, WM_CF_SHOW, 0, GUI_ID_SLIDER0);
 
   // Create the button
-  hButton = BUTTON_CreateEx(120, 100, 80, 60, 0, WM_CF_SHOW, 0, GUI_ID_BUTTON0);
+  hButton = BUTTON_CreateEx(250, 70, 60, 60, 0, WM_CF_SHOW, 0, GUI_ID_BUTTON0);
 
 
   BUTTON_SetFont(hButton, &GUI_Font8x16);
   // Set the button text
-  BUTTON_SetText(hButton, "Test");
+  BUTTON_SetText(hButton, "Color");
 //  GUI_Exec();
 
 
@@ -229,7 +236,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  GUI_PID_GetCurrentState(&pstate);
 
-	  GUI_DispDecAt(count, 20,20,4);
+	 // GUI_DispDecAt(count, 20,20,4);
 
 	  sprintf(countString, "%d", count);
 
@@ -237,9 +244,9 @@ int main(void)
 	  PROGBAR_SetText(hProgbar, countString); 		//use string for text on progress bar
 
 //	  Convert_Pos();
-	  GUI_TOUCH_GetState(&pstate);  /* Get the touch position in pixel */
-	  GUI_DispDecAt(pstate.x, 100,50,3);
-	  GUI_DispDecAt(pstate.y, 200,50,3);
+//	  GUI_TOUCH_GetState(&pstate);  /* Get the touch position in pixel */
+//	  GUI_DispDecAt(pstate.x, 100,50,3);
+//	  GUI_DispDecAt(pstate.y, 200,50,3);
 
 //	  GUI_DispDecAt(GUI_TOUCH_GetxPhys(), 100,50,3);
 //	  GUI_DispDecAt(GUI_TOUCH_GetyPhys(), 200,50,3);
@@ -252,28 +259,36 @@ int main(void)
 //	  GUI_DispStringAt(touchString, 150, 50);
 
 
-	  if(pstate.Pressed)
-	  {
-		  GUI_DispStringAt("P", 200,20);
-//		  GUI_DispDecAt(TPReadX(), 200,50,4);
-//		  GUI_SPRITE_Show(hSprite);
+//	  if(pstate.Pressed)
+//	  {
+//		  GUI_DispStringAt("P", 200,20);
+////		  GUI_DispDecAt(TPReadX(), 200,50,4);
+////		  GUI_SPRITE_Show(hSprite);
+//	  }
+//	  else
+//	  {
+//		  GUI_DispStringAt("   ", 200,20);
+////		  GUI_SPRITE_Hide(hSprite);
+//	  }
+//
+
+
+
+	  if(BUTTON_IsPressed(hButton)) // if the button is pressed
+  	  {// change the font color to blue
+		  GUI_SetFont(&GUI_Font32B_ASCII);
+		  GUI_SetColor(GUI_BLUE);
+		  GUI_DispStringAt("ECET 260 Lab 5", 40,80);
+		  GUI_SetFont(&GUI_FontComic24B_1);
+		  GUI_DispStringAt("Navreet", 120,120);
 	  }
-	  else
-	  {
-		  GUI_DispStringAt("   ", 200,20);
-//		  GUI_SPRITE_Hide(hSprite);
-	  }
-
-
-
-
-	  if(BUTTON_IsPressed(hButton))
-  	  {
-		  GUI_DispStringAt("B", 210,80);
-	  }
-	  else
-	  {
-		  GUI_DispStringAt("     ", 210,80);
+	  else  // if not pressed
+	  {  // change the font color to dark red
+		  GUI_SetFont(&GUI_Font32B_ASCII);
+	      GUI_SetColor(GUI_DARKRED);
+		  GUI_DispStringAt("ECET 260 Lab 5", 40,80);
+		  GUI_SetFont(&GUI_FontComic24B_1);
+		  GUI_DispStringAt("Navreet", 120,120);
 	  }
 
 
